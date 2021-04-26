@@ -48,7 +48,7 @@ async function updateData(){
 }
 
 // init data;
-updateData();
+// updateData();
 setInterval(function(){
 	updateData();
 },1000*60*10);
