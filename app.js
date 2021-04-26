@@ -9,6 +9,9 @@ const index = require('./routes/index');
 
 const app = express();
 
+const crawling = require('./libs/crawling/index.js');
+const fs = require('fs');
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -33,6 +36,22 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.json({ err });
 });
+
+async function updateData(){
+  console.log("data update start");
+  let data = await crawling.extractData();
+  let origin = JSON.parse(fs.readFileSync('./configs/data/data.json','utf-8'));
+  origin["prev"] = origin["now"];
+  origin["now"] = data;
+  fs.writeFileSync('./configs/data/data.json',JSON.stringify(origin));
+  console.log("data update finish");
+}
+
+// init data;
+updateData();
+setInterval(function(){
+	updateData();
+},1000*60*10);
 
 app.listen(process.env.PORT || 3000, () => console.log('Example app listening on port 3000!'));
 

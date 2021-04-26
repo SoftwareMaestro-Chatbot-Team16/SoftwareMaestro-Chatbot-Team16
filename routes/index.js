@@ -3,14 +3,9 @@ const express = require('express');
 const router = express.Router();
 
 const libKakaoWork = require('../libs/kakaoWork');
-const crawling = require('../libs/crawling/index.js');
 
 router.get('/', async (req, res, next) => {
-	
-  // console.log("crawling start!!");
-  // let data = await crawling.extractData();
-  // console.log(data);
-	
+		
   // // 유저 목록 검색 (1)
   // const users = await libKakaoWork.getUserList();
 
@@ -55,5 +50,6 @@ router.get('/', async (req, res, next) => {
   //   conversations,
   //   messages,
   // });
+  res.send("ok");
 });
 module.exports = router;
