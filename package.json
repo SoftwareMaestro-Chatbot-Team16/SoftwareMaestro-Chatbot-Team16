@@ -18,10 +18,6 @@
   "scripts": {
     "start": "NODE_ENV=development NODE_CONFIG_DIR=./configs/app node app"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://neity16: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@github.com/SoftwareMaestro-Chatbot-Team16/SoftwareMaestro-Chatbot-Team16.git"
-  },
   "author": "",
   "license": "ISC",
   "bugs": {
