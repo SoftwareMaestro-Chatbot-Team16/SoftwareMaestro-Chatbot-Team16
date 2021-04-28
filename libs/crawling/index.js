@@ -45,28 +45,28 @@ async function getAll(page){
 async function getOne(page, index){
     let result = {};
     let temp = await page.$(`#contentsList > div > div > div > table > tbody > tr:nth-child(${index}) > td.tit > div.rel > a`);
-    result.title = await page.evaluate((data)=>{ return data.textContent; },temp);
+    result.title = await page.evaluate((data)=>{ return data.innerText; },temp);
 
     temp = await page.$(`#contentsList > div > div > div > table > tbody > tr:nth-child(${index}) > td:nth-child(1)`);
-    result.no = await page.evaluate((data)=>{ return data.textContent; },temp);
+    result.no = await page.evaluate((data)=>{ return data.innerText; },temp);
 
     temp = await page.$(`#contentsList > div > div > div > table > tbody > tr:nth-child(${index}) > td:nth-child(3)`);
-    result.duration = await page.evaluate((data)=>{ return data.textContent; },temp);
+    result.duration = await page.evaluate((data)=>{ return data.innerText; },temp);
 
     temp = await page.$(`#contentsList > div > div > div > table > tbody > tr:nth-child(${index}) > td:nth-child(4)`);
-    result.lecture_day = await page.evaluate((data)=>{ return data.textContent; },temp);
+    result.lecture_day = await page.evaluate((data)=>{ return data.innerText; },temp);
 
     temp = await page.$(`#contentsList > div > div > div > table > tbody > tr:nth-child(${index}) > td:nth-child(5)`);
-    result.people = await page.evaluate((data)=>{ return data.textContent; },temp);
+    result.people = await page.evaluate((data)=>{ return data.innerText; },temp);
 
     temp = await page.$(`#contentsList > div > div > div > table > tbody > tr:nth-child(${index}) > td:nth-child(6)`);
-    result.status = await page.evaluate((data)=>{ return data.textContent; },temp);
+    result.status = await page.evaluate((data)=>{ return data.innerText; },temp);
 
     temp = await page.$(`#contentsList > div > div > div > table > tbody > tr:nth-child(${index}) > td:nth-child(7)`);
-    result.name = await page.evaluate((data)=>{ return data.textContent; },temp);
+    result.name = await page.evaluate((data)=>{ return data.innerText; },temp);
 
     temp = await page.$(`#contentsList > div > div > div > table > tbody > tr:nth-child(${index}) > td:nth-child(8)`);
-    result.day = await page.evaluate((data)=>{ return data.textContent; },temp);
+    result.day = await page.evaluate((data)=>{ return data.innerText; },temp);
 
     return Promise.resolve(result);
 }
@@ -74,6 +74,7 @@ async function getOne(page, index){
 async function print_extractData(){
     const browser = await puppeteer.launch({
 		args : ['--no-sandbox', '--disable-setuid-sandbox'],
+		defaultViewport: {width: 1920, height: 1080},
 	});
     const page = await browser.newPage();
     page.on('dialog', async dialog => {
