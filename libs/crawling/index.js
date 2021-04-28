@@ -13,7 +13,7 @@ const mentorPage_url = "https://swmaestro.org/sw/mypage/myTeam/mentoPropose.do?v
 
 async function getAllUsers(page){
     let result = {};
-    await page.waitFor(500);
+    await page.waitForTimeout(500);
     const number = await page.$$eval(`#searchList > div > table > tbody > tr`,(data)=>data.length);
     for(let i=0 ;i < number; i++){
         let t1 = await page.$(`#searchList > div > table > tbody > tr:nth-child(${i+1}) > td:nth-child(1)`);
@@ -93,7 +93,7 @@ async function print_extractData(){
     await page.click('button[type="submit"]');
 
     //wait login
-    await page.waitFor(500);
+    await page.waitForTimeout(500);
 
     //login Failure
     if(page.url() === loginPage_url){
