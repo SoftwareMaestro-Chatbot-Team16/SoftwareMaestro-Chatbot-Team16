@@ -35,16 +35,20 @@ sendMessage = async ({ conversationId, text, blocks }) => {
 	return res.data.message;
 }
 
-sendMessageToEveryUsers = async () => {
+// 모두에게 동일한 msg 를 보냄.
+sendMessageToEveryUsers = async (msg) => {
+	// TODO: kakao api 에서 디폴트로는 10명이 한계이기 때문에, 수정이 필요함.
 	const users = await getUserList();
+
 	const conversations = await Promise.all(
 		users.map((u) => openConversations({ userId: u.id }))
 	);
 	
 	const messages = await Promise.all([
-		conversations.map((c) => sendMessage(
-			blockBuilder.block_select_menus(c.id)
-		))
+		conversations.map((c) => {
+			msg['conversationId'] = c.id;
+			sendMessage(msg);
+		})
 	]);
 	
 	return {users, conversations, messages};
