@@ -5,7 +5,7 @@ const Config = require('config');
 
 const libKakaoWork = require('../libs/kakaoWork');
 const fs = require('fs');
-
+const blockBuilder = require('../libs/block_builder');
 var data = JSON.parse(fs.readFileSync('./configs/data/data.json','utf-8'));
 
 router.get('/', async (req, res, next) => {
