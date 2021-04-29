@@ -62,10 +62,11 @@ router.post('/callback', async (req, res, next) => {
 			);
 		break;
 	}
-	await libKakaoWork.sendMessage(
-		blockBuilder.block_select_menus(conversation_id)
-	);
 	res.json({result: true});
+
+	setTimeout((id) => libKakaoWork.sendMessage(
+		blockBuilder.block_select_menus(id)
+	), 2000, conversation_id);
 })
 
 router.get('/user', (req, res, next) => {
@@ -82,7 +83,6 @@ router.get('/user', (req, res, next) => {
 
 router.get('/mentor', (req, res, next) => {
 	const techs = decodeURIComponent(req.query.techs).split(",");
-	
 	if(!techs) {
 		res.sendStatus(400);
 	}  

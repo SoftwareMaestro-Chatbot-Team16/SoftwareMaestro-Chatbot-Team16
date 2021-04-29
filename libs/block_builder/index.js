@@ -15,6 +15,16 @@ function block_select_menus(id) {
 		  "style": "yellow"
 		},
 		{
+		  "type": "text",
+		  "text": "소마 생활에 필요한 다양한 정보들을 편리하게 검색보세요!",
+		  "markdown": false,
+		},
+		{
+		  "type": "text",
+		  "text": "*10분*마다 새로 올라온 멘토링 정보를 알려주는 기능도 있답니다 👏👏",
+		  "markdown": true,
+		},
+		{
 		  "type": "image_link",
 		  "url": "https://images.velog.io/images/neity16/post/e8ebb790-0c1e-469a-8a78-f0a53e375755/search_sm.jpeg"
 		},
@@ -448,7 +458,7 @@ function constructText(text, markdown=false) {
 function class_block_sender (lecture, actions, conversationId) {
 	let infoMsg = actions.search_type == "name" ? 
 		`*${actions.value}* 멘토님이 여시는 멘토링을 모아봤어요.` :
-		`제목에 *${actions.value}* 가 들어가는 멘토링을 모아봤어요.`;
+		`제목에 *${actions.value}* 이(가) 들어가는 멘토링을 모아봤어요.`;
 
 	let block = [
 		{
@@ -465,9 +475,12 @@ function class_block_sender (lecture, actions, conversationId) {
 		  "type": "divider"
 		},
 		constructText(lecture.title),
+		constructDescription("강의번호", lecture.no),
 		constructDescription("일시", lecture.lecture_day),
 		constructDescription("멘토님", lecture.name),
-		constructDescription("현재 접수인원", lecture.people),
+		constructDescription("접수인원", lecture.people),
+		constructDescription("상태", lecture.status),
+		constructDescription("접수기간", lecture.duration),
   	];
 	
 	let block_msg = {
@@ -487,6 +500,13 @@ function search_class (actions, conversationId) {
 		request(url, (err, response, body) => {
 			let result = [];
 			const parsed_body = JSON.parse(body);
+			
+			// 검색 결과가 없는 경우, 예외 메시지
+			if (Object.values(parsed_body).length == 0 ) {
+				result.push(libKakaoWork.sendMessage(no_result_msg(conversationId)));
+				resolve(result);
+			}
+
 			for(var lecture of parsed_body) {
 				let msg = class_block_sender (
 					lecture, actions, conversationId
@@ -517,6 +537,24 @@ function mentor_block_sender (name, filter_list, conversationId) {
 	}
 
 	return block_msg;
+}
+function no_result_msg(conversationId) {
+	return {
+	  "conversationId": conversationId,
+	  "text": "검색 결과",
+	  "blocks": [
+		{
+		  "type": "header",
+		  "text": "검색 결과",
+		  "style": "red"
+		},
+		{
+		  "type": "text",
+		  "text": "아쉽게도 검색결과가 없네요😢",
+		  "markdown": true
+		}
+	  ]
+	};
 }
 
 function search_mentor (actions, conversationId) {
@@ -550,13 +588,19 @@ function search_mentor (actions, conversationId) {
 			resolve(libKakaoWork.sendMessage(please_choose_one));
 		})];
 	}
-	let param = encodeURIComponent(filter_list.join(', '));
+	let param = encodeURIComponent(filter_list.join(','));
 	url  = baseUrl;
 	url += `/mentor?techs=${param}`
 	return [new Promise(resolve => {
 		request(url, (err, response, body) => {
 			let result = [];
 			const parsed_body = JSON.parse(body);
+			
+			// 결과가 없는 경우
+			if (Object.values(parsed_body).length == 0) {
+				result.push(libKakaoWork.sendMessage(no_result_msg(conversationId)));
+				resolve(result);
+			}
 			for(var v of parsed_body) {
 				let msg = mentor_block_sender (
 					v.name, filter_list, conversationId
