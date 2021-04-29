@@ -3,37 +3,13 @@ const express = require('express');
 const router = express.Router();
 
 const libKakaoWork = require('../libs/kakaoWork');
-const blockBuilder = require('../libs/block_builder');
 const fs = require('fs');
 const data = JSON.parse(fs.readFileSync('./configs/data/data.json','utf-8'));
 
 router.get('/', async (req, res, next) => {
-	let select_block = blockBuilder.block_select_menus();
-	var {users, conversations, messages} = await libKakaoWork.sendMessageToEveryUsers(select_block);
-	
-	res.send("OK");
+	const users = await libKakaoWork.getUserList();
+	res.send(users);
 });
-
-router.post('/request', async (req, res, next) => {
-	const {message, value} = req.body;
-	switch (value) {
-		case 'mentee':
-			return res.json({
-				view: blockBuilder.modal_search_mentee()
-			})
-			break;
-		case 'mentor':
-			return res.json({
-				view: blockBuilder.modal_search_mentor()
-			})
-			break;
-		case 'class':
-			return res.json({
-				view: blockBuilder.modal_search_class()
-			})
-			break;
-	}
-})
 
 router.get('/user', (req, res, next) => {
 	const tech = req.query.tech;
@@ -81,5 +57,20 @@ router.get('/lecture', async (req, res, next) => {
 	);
 	res.send(result);
 });
+
+router.get('/new-lecture', async(req, res, next) => {
+	const now = data.now.lectures;
+	const prev = data.prev.lectures;
+
+	var chk = {};
+	var result = [];
+	for(i of prev){
+		chk[i.no] = 1;
+	}
+	for(i of now){
+		if(chk[i.no]===undefined) result.push(i);
+	}
+	res.send(result);
+})
 
 module.exports = router;
