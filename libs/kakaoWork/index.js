@@ -9,9 +9,15 @@ const kakaoInstance = axios.create({
 });
 
 exports.getUserList = async () => {
-	const res = await kakaoInstance.get('/v1/users.list');
-	console.log(res);
-	return res.data.users;
+	result = [];
+	const res = await kakaoInstance.get('/v1/users.list?limit=100');
+	const pageCursor = res.data.cursor;
+	const nxtRes = await kakaoInstance.get(`/v1/users.list?cursor=${pageCursor}`);
+	result = res.data.users;
+	for(var i=0; i<nxtRes.data.users.length;i++){
+		result.push(nxtRes.data.users[i]);
+	}
+	return Promise.resolve(result);
 }
 // 채팅방 생성
 exports.openConversations = async({ userId }) => {
