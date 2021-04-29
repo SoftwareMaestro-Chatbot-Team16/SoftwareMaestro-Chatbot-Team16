@@ -45,7 +45,6 @@ router.post('/request', async (req, res, next) => {
 router.post('/callback', async (req, res, next) => {
 	const {action_time, actions, message, value} = req.body;
 	const conversation_id = message.conversation_id;
-	console.log(req.body);
 	switch (value) {
 		case 'search_mentee':
 			await Promise.all(
@@ -63,6 +62,7 @@ router.post('/callback', async (req, res, next) => {
 			);
 		break;
 	}
+	libKakaoWork.sendMessage(blockBuilder.block_select_menus(conversation_id));
 	res.json({result: true});
 })
 
