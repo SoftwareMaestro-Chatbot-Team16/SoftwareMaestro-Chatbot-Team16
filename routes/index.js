@@ -10,6 +10,14 @@ var data = JSON.parse(fs.readFileSync('./configs/data/data.json','utf-8'));
 
 router.get('/', async (req, res, next) => {
 	const users = await libKakaoWork.getUserList();
+	const converations = await Promise.all(
+		users.map((u) => libKakaoWork.openConversations({userId: u.id}))
+	);
+	const messages = await Promise.all([
+		converations.map((c) => libKakaoWork.sendMessage(
+			blockBuilder.block_select_menus(c.id)
+		))
+	])
 	res.send(users);
 });
 

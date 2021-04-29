@@ -4,9 +4,9 @@ const request = require('request');
 const libKakaoWork = require('../kakaoWork');
 
 // Construct select_menu_block (mentor / mentee / class)
-function block_select_menus() {
+function block_select_menus(id) {
 	let block = {
-	  "conversationId": 0, // default value.
+	  "conversationId": id, // default value.
 	  "text": "소마12기 검색봇",
 	  "blocks": [
 		{
