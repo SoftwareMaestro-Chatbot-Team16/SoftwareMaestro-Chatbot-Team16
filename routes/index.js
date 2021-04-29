@@ -63,6 +63,7 @@ router.post('/callback', async (req, res, next) => {
 			);
 		break;
 	}
+	res.json({result: true});
 })
 
 router.get('/user', (req, res, next) => {
