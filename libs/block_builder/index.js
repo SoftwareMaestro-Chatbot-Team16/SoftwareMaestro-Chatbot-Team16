@@ -469,7 +469,6 @@ function class_block_sender (lecture, actions, conversationId) {
 		constructDescription("멘토님", lecture.name),
 		constructDescription("현재 접수인원", lecture.people),
   	];
-
 	
 	let block_msg = {
 	  "conversationId": conversationId,
@@ -499,10 +498,81 @@ function search_class (actions, conversationId) {
 	})];
 }
 
+function mentor_block_sender (name, filter_list, conversationId) {
+	let block = [
+		{
+		  "type": "header",
+		  "text": "멘토님 검색 결과",
+		  "style": "red"
+		},
+		constructText(`*${filter_list.join(',')}* 에 💪자신있는 멘토님들을 찾아봤어요.`, true),
+		{"type": "divider"},
+		constructText(`*${name}*`, true),
+	  ]
+
+	let block_msg = {
+	  "conversationId": conversationId,
+	  "text": "멘토님 검색 결과",
+	  "blocks": block
+	}
+
+	return block_msg;
+}
+
+function search_mentor (actions, conversationId) {
+	let url;
+	let tmp = Object.values(actions);
+	let filter_list = [];
+	for(var v of tmp) {
+		if (v) filter_list.push(v);
+	}
+	
+	const please_choose_one = {
+	  "conversationId": conversationId,
+	  "text": "주의!",
+	  "blocks": [
+		{
+		  "type": "header",
+		  "text": "주의!",
+		  "style": "red"
+		},
+		{
+		  "type": "text",
+		  "text": "멘토님을 검색할 때, *최소한 한 개*의 선택지는 선택해주세요 😢",
+		  "markdown": true
+		}
+	  ]
+	}
+	
+	// 아무것도 선택되지 않은 경우, 경고메시지를 반환. 
+	if (filter_list.length == 0) {
+		return [new Promise(resolve => {
+			resolve(libKakaoWork.sendMessage(please_choose_one));
+		})];
+	}
+	let param = encodeURIComponent(filter_list.join(', '));
+	url  = baseUrl;
+	url += `/mentor?techs=${param}`
+	return [new Promise(resolve => {
+		request(url, (err, response, body) => {
+			let result = [];
+			const parsed_body = JSON.parse(body);
+			for(var v of parsed_body) {
+				let msg = mentor_block_sender (
+					v.name, filter_list, conversationId
+				);
+				result.push(libKakaoWork.sendMessage(msg));
+			}
+			resolve(result);
+		});
+	})];
+}
+
 
 exports.block_select_menus = block_select_menus;
 exports.modal_search_mentee = modal_search_mentee;
 exports.modal_search_mentor = modal_search_mentor;
 exports.modal_search_class = modal_search_class;
 exports.search_mentee = search_mentee;
+exports.search_mentor = search_mentor;
 exports.search_class = search_class;

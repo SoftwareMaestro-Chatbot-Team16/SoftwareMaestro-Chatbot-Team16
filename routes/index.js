@@ -53,7 +53,9 @@ router.post('/callback', async (req, res, next) => {
 			);
 			break;
 		case 'search_mentor':
-			// TODO
+			await Promise.all(
+				await blockBuilder.search_mentor (actions, conversation_id)
+			);
 		break;
 		case 'search_class':
 			await Promise.all(
