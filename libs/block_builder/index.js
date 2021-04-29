@@ -16,7 +16,7 @@ function block_select_menus(id) {
 		},
 		{
 		  "type": "image_link",
-		  "url": "https://as1.ftcdn.net/jpg/02/48/32/46/500_F_248324676_WtiYuVi0L3ZD0bW3Wfv7yrQJwWbbp69C.jpg"
+		  "url": "https://images.velog.io/images/neity16/post/e8ebb790-0c1e-469a-8a78-f0a53e375755/search_sm.jpeg"
 		},
 		{
 		  "type": "button",
@@ -568,6 +568,39 @@ function search_mentor (actions, conversationId) {
 	})];
 }
 
+function constructLecture(lecture){
+	return block = [
+		constructText(`*${lecture.name}*님의 강의에요`,true),
+		constructDescription("강의번호", lecture.no),
+		constructDescription("상태", lecture.status),
+		constructDescription("제목", lecture.title),
+		{
+			"type": "divider"
+		},
+	];
+}
+
+function newlecture_block_sender(lectures, conversationId){
+	let block = [
+		{
+			"type": "header",
+			"text": "새로운 강의가 도착했어요",
+			"style": "yellow"
+		},
+	]
+
+	for(let i = 0; i < lectures.length; i++){
+		block.push(constructLecture(lectures[i]));
+	}
+
+	let block_msg = {
+		"conversationId": conversationId,
+		"text": "새로운 강의가 도착했어요",
+		"blocks": block
+	}
+
+	return block_msg;
+}
 
 exports.block_select_menus = block_select_menus;
 exports.modal_search_mentee = modal_search_mentee;
@@ -576,3 +609,4 @@ exports.modal_search_class = modal_search_class;
 exports.search_mentee = search_mentee;
 exports.search_mentor = search_mentor;
 exports.search_class = search_class;
+exports.newlecture_block_sender = newlecture_block_sender;
