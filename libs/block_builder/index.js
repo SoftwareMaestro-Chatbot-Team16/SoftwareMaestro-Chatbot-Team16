@@ -1,3 +1,8 @@
+const Config = require('config');
+const baseUrl = Config.baseUrl;
+const request = require('request');
+const libKakaoWork = require('../kakaoWork');
+
 // Construct select_menu_block (mentor / mentee / class)
 function block_select_menus() {
 	let block = {
@@ -92,7 +97,7 @@ function modal_search_mentee() {
 			  "value": "차세대보안"
 			}
 		  ],
-		  "required": false,
+		  "required": true,
 		  "placeholder": "관심기술"
 		}
 	  ]
@@ -376,7 +381,128 @@ function modal_search_class() {
 	return modal;
 }
 
+function mentee_block_sender (name, tech, conversationId) {
+	let block = [
+		{
+		  "type": "header",
+		  "text": "연수생 검색 결과",
+		  "style": "blue"
+		},
+		constructText(`*${tech}*에 관심있는 연수생들을 찾아봤어요.`, true),
+		{"type": "divider"},
+		constructText(`*${name}*`, true),
+	  ]
+
+	let block_msg = {
+	  "conversationId": conversationId,
+	  "text": "연수생 검색 결과",
+	  "blocks": block
+	}
+
+	return block_msg;
+}
+
+function search_mentee (actions, conversationId) {
+	const url = baseUrl + `/user?tech=${encodeURIComponent(actions.tech)}`;
+	
+	// request 에 등록한 콜백 함수가 메시지를 보내는 작업을 하는데,
+	// 이를 기다리기 위해서 Promise 를 리턴함.
+	// 사용할 때 await 해주면 됨.
+	// ref: https://senticoding.tistory.com/42
+	return [new Promise(resolve => {
+		request(url, (err, response, body) => {
+			let result = [];
+			const parsed_body = JSON.parse(body);
+			for(var v of parsed_body) {
+				let msg = mentee_block_sender (
+					v.name, actions.tech, conversationId
+				);
+				result.push(libKakaoWork.sendMessage(msg));
+			}
+			resolve(result);
+		});
+	})];
+}
+
+function constructDescription(term, text, markdown=false) {
+	return {
+	  "type": "description",
+	  "term": term,
+	  "content": {
+		"type": "text",
+		"text": text,
+		"markdown": markdown
+	  },
+	  "accent": true
+	}
+}
+
+function constructText(text, markdown=false) {
+	return {
+      "type": "text",
+      "text": text,
+      "markdown": markdown
+    }
+}
+
+function class_block_sender (lecture, actions, conversationId) {
+	let infoMsg = actions.search_type == "name" ? 
+		`*${actions.value}* 멘토님이 여시는 멘토링을 모아봤어요.` :
+		`제목에 *${actions.value}* 가 들어가는 멘토링을 모아봤어요.`;
+
+	let block = [
+		{
+		  "type": "header",
+		  "text": "멘토링 검색 결과",
+		  "style": "yellow"
+		},
+		{
+		  "type": "text",
+		  "text": infoMsg,
+		  "markdown": true
+		},
+		{
+		  "type": "divider"
+		},
+		constructText(lecture.title),
+		constructDescription("일시", lecture.lecture_day),
+		constructDescription("멘토님", lecture.name),
+		constructDescription("현재 접수인원", lecture.people),
+  	];
+
+	
+	let block_msg = {
+	  "conversationId": conversationId,
+	  "text": "멘토링 검색 결과",
+	  "blocks": block
+	}
+	return block_msg;
+}
+
+function search_class (actions, conversationId) {
+	let url;
+	url  = baseUrl;
+	url += `/lecture?filter=${encodeURIComponent(actions.search_type)}`;
+	url += `&keyword=${encodeURIComponent(actions.value)}`;
+	return [new Promise(resolve => {
+		request(url, (err, response, body) => {
+			let result = [];
+			const parsed_body = JSON.parse(body);
+			for(var lecture of parsed_body) {
+				let msg = class_block_sender (
+					lecture, actions, conversationId
+				);
+				result.push(libKakaoWork.sendMessage(msg));
+			}
+			resolve(result);
+		});
+	})];
+}
+
+
 exports.block_select_menus = block_select_menus;
 exports.modal_search_mentee = modal_search_mentee;
 exports.modal_search_mentor = modal_search_mentor;
 exports.modal_search_class = modal_search_class;
+exports.search_mentee = search_mentee;
+exports.search_class = search_class;
