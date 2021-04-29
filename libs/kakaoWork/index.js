@@ -12,12 +12,13 @@ exports.getUserList = async () => {
 	result = [];
 	const res = await kakaoInstance.get('/v1/users.list?limit=100');
 	const pageCursor = res.data.cursor;
-	const nxtRes = await kakaoInstance.get(`/v1/users.list?cursor=${pageCursor}`);
-	result = res.data.users;
-	for(var i=0; i<nxtRes.data.users.length;i++){
-		result.push(nxtRes.data.users[i]);
+	
+	// 인원이 100명 이하인 테스트용 워크 스페이스에서는 바로 리턴시킴
+	if (!pageCursor) {
+		return res.data.users;
 	}
-	return Promise.resolve(result);
+	const nxtRes = await kakaoInstance.get(`/v1/users.list?cursor=${pageCursor}`);
+	return res.data.users.concat(nxtRes.data.users);
 }
 // 채팅방 생성
 exports.openConversations = async({ userId }) => {
