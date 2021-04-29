@@ -48,27 +48,28 @@ router.post('/callback', async (req, res, next) => {
 	switch (value) {
 		case 'search_mentee':
 			await Promise.all(
-				await blockBuilder.search_mentee (actions, conversation_id)
+				blockBuilder.search_mentee (actions, conversation_id)
 			);
 			break;
 		case 'search_mentor':
 			await Promise.all(
-				await blockBuilder.search_mentor (actions, conversation_id)
+				blockBuilder.search_mentor (actions, conversation_id)
 			);
 		break;
 		case 'search_class':
 			await Promise.all(
-				await blockBuilder.search_class (actions, conversation_id)
+				blockBuilder.search_class (actions, conversation_id)
 			);
 		break;
 	}
-	libKakaoWork.sendMessage(blockBuilder.block_select_menus(conversation_id));
+	await libKakaoWork.sendMessage(
+		blockBuilder.block_select_menus(conversation_id)
+	);
 	res.json({result: true});
 })
 
 router.get('/user', (req, res, next) => {
 	const tech = decodeURIComponent(req.query.tech);
-	console.log("<<", tech);
 	if(!tech) {
 		res.sendStatus(400);
 	}  

@@ -574,6 +574,7 @@ function constructLecture(lecture){
 		constructDescription("강의번호", lecture.no),
 		constructDescription("상태", lecture.status),
 		constructDescription("제목", lecture.title),
+		constructDescription("강의날짜", lecture.lecture_day),
 		{
 			"type": "divider"
 		},
@@ -584,18 +585,18 @@ function newlecture_block_sender(lectures, conversationId){
 	let block = [
 		{
 			"type": "header",
-			"text": "새로운 강의가 도착했어요",
+			"text": "🔔 새로운 강의가 도착했어요~",
 			"style": "yellow"
 		},
 	]
 
 	for(let i = 0; i < lectures.length; i++){
-		block.push(constructLecture(lectures[i]));
+		block = block.concat(constructLecture(lectures[i]));
 	}
 
 	let block_msg = {
 		"conversationId": conversationId,
-		"text": "새로운 강의가 도착했어요",
+		"text": "🔔 새로운 강의가 도착했어요~",
 		"blocks": block
 	}
 

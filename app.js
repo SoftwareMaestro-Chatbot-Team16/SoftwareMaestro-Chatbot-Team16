@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const Config = require('config');
 
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
@@ -10,6 +11,8 @@ const index = require('./routes/index');
 const app = express();
 
 const crawling = require('./libs/crawling/index.js');
+const blockBuilder = require('./libs/block_builder');
+const libKakaoWork = require('./libs/kakaoWork');
 const fs = require('fs');
 
 app.use(logger('dev'));
@@ -47,10 +50,35 @@ async function updateData(){
   console.log("data update finish");
 }
 
-// init data;
-// updateData();
+// 새로운 강의들을 찾고, 있으면 알림을 보냄.
+// 혹시 알림이 안간다면 너무 많은 강의들이 있어서 send 에 실패했을 수 있음.
+async function getNewLectures() {
+	const axios = require('axios');	
+	const test = axios.create({
+		baseURL: Config.baseUrl,
+	});
+	let result = await test.get('/new-lecture');
+	let lectures = result.data;
+	
+	// 새로운 강의가 없으면 종료.
+	if (lectures.length == 0) {
+		return;
+	}
+	const users = await libKakaoWork.getUserList();
+	const converations = await Promise.all(
+		users.map((u) => libKakaoWork.openConversations({userId: u.id}))
+	);
+	await Promise.all([
+		converations.map((c) => libKakaoWork.sendMessage(
+			blockBuilder.newlecture_block_sender(lectures, c.id)
+		))
+	]);
+}
+
+// start 하고 10분 지나야 실행됨.
 setInterval(function(){
 	updateData();
+	getNewLectures();
 },1000*60*10);
 
 app.listen(process.env.PORT || 3000, () => console.log('Example app listening on port 3000!'));
