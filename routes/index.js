@@ -23,14 +23,22 @@ router.get('/user', (req, res, next) => {
 });
 
 router.get('/mentor', (req, res, next) => {
-	const tech = req.query.tech;
-	if(!tech) {
+	const techs = decodeURIComponent(req.query.techs).split(",");
+	
+	if(!techs) {
 		res.sendStatus(400);
 	}  
+	
 	const mentors = Object.values(data.now.mentors);
-	const result = mentors.filter(mentor => 
-		mentor.tech.includes(tech)
-    );
+	const result = mentors.filter(mentor => {
+		for(const tech of techs) {
+			const isIncluded = mentor.tech.includes(tech);
+			if(!isIncluded) {
+				return false;
+			}
+		}
+		return true;
+	});
 	res.send(result);
 });
 
