@@ -70,6 +70,7 @@ router.post('/callback', async (req, res, next) => {
 })
 
 router.get('/user', (req, res, next) => {
+	data = JSON.parse(fs.readFileSync('./configs/data/data.json','utf-8'));
 	const tech = decodeURIComponent(req.query.tech);
 	if(!tech) {
 		res.sendStatus(400);
@@ -82,6 +83,7 @@ router.get('/user', (req, res, next) => {
 });
 
 router.get('/mentor', (req, res, next) => {
+	data = JSON.parse(fs.readFileSync('./configs/data/data.json','utf-8'));
 	const techs = decodeURIComponent(req.query.techs).split(",");
 	if(!techs) {
 		res.sendStatus(400);
@@ -101,8 +103,6 @@ router.get('/mentor', (req, res, next) => {
 });
 
 router.get('/lecture', async (req, res, next) => {
-	// lecture 는 자주 변동이 일어나기 때문에, data.json 에서 새로 읽어옵니다.
-	// user 나 mentor 의 정보는 거의 변동이 일어나지 않기 때문에, 이전에 읽어온 데이터를 그대로 사용합니다.
 	data = JSON.parse(fs.readFileSync('./configs/data/data.json','utf-8'));
 	const filter = req.query.filter || "title";
 	const keyword = req.query.keyword;
