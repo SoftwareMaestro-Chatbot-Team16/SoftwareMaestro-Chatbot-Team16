@@ -7,7 +7,7 @@ const libKakaoWork = require('../kakaoWork');
 function block_select_menus(id) {
 	let block = {
 	  "conversationId": id, // default value.
-	  "text": "소마12기 검색봇",
+	  "text": "16팀 [소마 도우미] 검색 & 멘토링 알림봇",
 	  "blocks": [
 		{
 		  "type": "header",
