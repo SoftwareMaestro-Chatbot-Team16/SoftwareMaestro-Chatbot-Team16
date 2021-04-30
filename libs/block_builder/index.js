@@ -11,7 +11,7 @@ function block_select_menus(id) {
 	  "blocks": [
 		{
 		  "type": "header",
-		  "text": "소마12기 검색봇",
+		  "text": "소마12기 도우미",
 		  "style": "yellow"
 		},
 		{
