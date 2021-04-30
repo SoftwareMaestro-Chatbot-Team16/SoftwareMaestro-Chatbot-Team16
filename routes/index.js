@@ -119,6 +119,7 @@ router.get('/lecture', async (req, res, next) => {
 });
 
 router.get('/new-lecture', async(req, res, next) => {
+	data = JSON.parse(fs.readFileSync('./configs/data/data.json','utf-8'));
 	const now = data.now.lectures;
 	const prev = data.prev.lectures;
 

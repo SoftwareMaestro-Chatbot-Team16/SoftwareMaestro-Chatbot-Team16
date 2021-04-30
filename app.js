@@ -47,7 +47,7 @@ async function updateData(){
   origin["prev"] = origin["now"];
   origin["now"] = data;
   fs.writeFileSync('./configs/data/data.json',JSON.stringify(origin));
-  console.log("data update finish");
+  console.log("data update finish, update time : UTC(0)_",new Date().toLocaleString());
 }
 
 // 새로운 강의들을 찾고, 있으면 알림을 보냄.
@@ -76,9 +76,10 @@ async function getNewLectures() {
 }
 
 // start 하고 10분 지나야 실행됨.
-setInterval(function(){
-	updateData();
-	getNewLectures();
+console.log("server open time : UTC(0)_",new Date().toLocaleString());
+setInterval(async function(){
+	await updateData();
+	await getNewLectures();
 },1000*60*10);
 
 app.listen(process.env.PORT || 3000, () => console.log('Example app listening on port 3000!'));
